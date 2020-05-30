@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:widgettesting/bounce_widget.dart';
+import 'bounce_widget.dart';
 import 'constants.dart';
 
 class CustomButton extends StatelessWidget {
