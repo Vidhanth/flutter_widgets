@@ -4,12 +4,14 @@ class BounceOnTap extends StatefulWidget {
   final Widget child;
   final Duration duration;
   final double beginScale;
+  final int onTapSequence;
   final double endScale;
   final Curve curve;
   final Function onTap;
 
   BounceOnTap({
     this.child,
+    this.onTapSequence = 3,
     this.endScale = 0.85,
     this.beginScale = 1.0,
     this.onTap,
@@ -25,6 +27,12 @@ class _BounceOnTapState extends State<BounceOnTap>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
   Animation<double> _scale;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -48,12 +56,35 @@ class _BounceOnTapState extends State<BounceOnTap>
       scale: _scale,
       child: GestureDetector(
         onTap: () {
-          _controller.forward().whenComplete(() {
-            _controller.reverse().whenComplete(() {
-              if(widget.onTap!=null)
-                widget.onTap();
-            });
-          });
+          switch (widget.onTapSequence) {
+            case 1:
+              if (widget.onTap != null) widget.onTap();
+              _controller.forward().whenComplete(() {
+                _controller.reverse();
+              });
+              break;
+            case 2:
+              _controller.forward().whenComplete(() {
+                if(widget.onTap!=null)
+                  widget.onTap();
+                _controller.reverse();
+              });
+              break;
+            case 3:
+              _controller.forward().whenComplete(() {
+                _controller.reverse().whenComplete(() {
+                  if(widget.onTap!=null)
+                    widget.onTap();
+                });
+              });
+              break;
+            default:
+              _controller.forward().whenComplete(() {
+                if(widget.onTap!=null)
+                  widget.onTap();
+                _controller.reverse();
+              });
+          }
         },
         onTapDown: (s) {
           _controller.forward();
